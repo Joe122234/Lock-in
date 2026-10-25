@@ -167,11 +167,9 @@ export function formatWeekRange(start: DateKey, end: DateKey, locale: string): s
     day: 'numeric',
     ...(sameYear ? {} : { year: 'numeric' }),
   })
-  const right = formatDateKey(end, locale, {
-    ...(sameMonth ? {} : { month: 'short' }),
-    day: 'numeric',
-    year: 'numeric',
-  })
+  const right = sameMonth
+    ? `${formatDateKey(end, locale, { day: 'numeric' })}, ${end.slice(0, 4)}`
+    : formatDateKey(end, locale, { month: 'short', day: 'numeric', year: 'numeric' })
   return `${left} – ${right}`
 }
 

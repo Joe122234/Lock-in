@@ -1,0 +1,18 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // LOCK IN is deliberately a single-person workspace with no login.
+    // The workspace id is shipped in the client bundle, so this rule is
+    // access control only in the sense that nobody can guess a different
+    // workspace id. Anyone who can load the site can read and write this
+    // workspace. Keep the Firebase project private.
+    //
+    // If you change VITE_WORKSPACE_ID, change the path below to match.
+    match /workspaces/lock-in-personal/{document=**} {
+      allow read, write: if true;
+    }
+
+    // No other document paths are granted access.
+  }
+}

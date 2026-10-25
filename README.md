@@ -38,45 +38,37 @@ setup wizard.
 
 ## Quick start
 
-Requirements: Node.js 20+ (developed on Node 25), npm, and a Firebase project with Firestore
-enabled.
+Requirements: Node.js 20+ and npm.
 
 ```bash
 npm install
-cp .env.example .env.local
+npm run dev
 ```
 
-Create a Firebase Web App in the Firebase console and copy its config into `.env.local`:
+No environment file is required. The app ships with the LOCK IN Firebase project
+(`lock-in-ap`) already configured in `src/lib/firebase/client.ts` and the default workspace
+(`lock-in-personal`) configured in `src/lib/firebase/paths.ts`. The first load shows the setup
+wizard.
 
-```dotenv
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_STORAGE_BUCKET=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
-VITE_WORKSPACE_ID=lock-in-personal
-```
-
-`VITE_WORKSPACE_ID` defines the only Firestore workspace the client can touch. Keep the default, or
-use a different id and update `firestore.rules` to match. The app stores everything under:
+To point the app at a different Firebase project or workspace, copy `.env.example` to `.env.local`
+and override only the values you need. `VITE_WORKSPACE_ID` defines the only Firestore workspace the
+client can touch; if you change it, update `firestore.rules` to match. Data lives under:
 
 ```text
 workspaces/{VITE_WORKSPACE_ID}/settings/main
 workspaces/{VITE_WORKSPACE_ID}/{collection}/{documentId}
 ```
 
-Publish the rules before opening the app:
+### Deployment
+
+Hosting rewrites, Firestore rules, and indexes are already defined in `firebase.json`. To publish
+changes from an account that owns the Firebase project:
 
 ```bash
-firebase login
-firebase use lock-in-ap     # or your own project
-firebase deploy --only firestore:rules
-npm run dev
+npx firebase login
+npx firebase use lock-in-ap
+npx firebase deploy
 ```
-
-The first load shows the setup wizard. Saving it writes your first real workspace document and the
-four starter subjects/topics. Nothing is seeded until you finish onboarding.
 
 ### Local emulator (optional)
 
@@ -114,8 +106,9 @@ private. If you ever expose the app publicly, add authentication and scope the r
 before sharing it. Consider Firebase App Check as an additional layer. The in-app Settings → Data
 tab repeats this warning and lets you copy the current rules.
 
-The Firebase web config is not a secret, but it should still live in `.env.local`. That file is
-ignored by git. Committed `.env.example` values are placeholders.
+The Firebase web config is not a secret and ships with the app. Firestore rules are the real access
+boundary. If you fork this for a different project, change the config in
+`src/lib/firebase/client.ts` or override it in `.env.local` (ignored by git).
 
 ## Scripts
 

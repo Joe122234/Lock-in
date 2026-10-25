@@ -8,13 +8,28 @@ import {
   type Firestore,
 } from 'firebase/firestore'
 
+// Firebase web configuration is public by design; Firestore rules are the
+// actual security boundary. These defaults let the app run with no local
+// environment setup. Any VITE_FIREBASE_* value still overrides them.
+const defaultFirebaseConfig = {
+  apiKey: 'AIzaSyApRAVF2rJUpOfVy506IKdsFhbcfjXZvME',
+  authDomain: 'lock-in-ap.firebaseapp.com',
+  projectId: 'lock-in-ap',
+  storageBucket: 'lock-in-ap.firebasestorage.app',
+  messagingSenderId: '622954100506',
+  appId: '1:622954100506:web:b1ef7408071eef834a1ea3',
+}
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ?? '',
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? '',
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? '',
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? '',
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? '',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID ?? '',
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY?.trim() || defaultFirebaseConfig.apiKey,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN?.trim() || defaultFirebaseConfig.authDomain,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID?.trim() || defaultFirebaseConfig.projectId,
+  storageBucket:
+    import.meta.env.VITE_FIREBASE_STORAGE_BUCKET?.trim() || defaultFirebaseConfig.storageBucket,
+  messagingSenderId:
+    import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID?.trim() ||
+    defaultFirebaseConfig.messagingSenderId,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID?.trim() || defaultFirebaseConfig.appId,
 }
 
 const requiredConfig = [
@@ -36,7 +51,7 @@ let db: Firestore | null = null
 function getFirebaseApp(): FirebaseApp {
   if (!isFirebaseConfigured) {
     throw new Error(
-      'Firebase is not configured. Add the VITE_FIREBASE_* values to your local environment and reload the app.',
+      'Firebase is not configured. Check src/lib/firebase/client.ts or the optional VITE_FIREBASE_* environment overrides.',
     )
   }
   if (!app) {

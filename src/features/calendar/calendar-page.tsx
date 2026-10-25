@@ -177,9 +177,12 @@ export function CalendarPage() {
         return day !== 0 && day !== 6
       })
   const monthColumnCount = settings.calendar.showWeekends ? 7 : 5
-  const monthWeekdayHeaders = (settings.calendar.showWeekends
-    ? [0, 1, 2, 3, 4, 5, 6]
-    : [1, 2, 3, 4, 5]) as Weekday[]
+  const monthWeekdayHeaders = Array.from(
+    { length: 7 },
+    (_, offset) => ((weekStartsOn + offset) % 7) as Weekday,
+  ).filter(
+    (day) => settings.calendar.showWeekends || (day !== 0 && day !== 6),
+  )
   const selectedDayCapacity = capacityFor(anchor)
 
   const navigate = (direction: -1 | 1) => {
